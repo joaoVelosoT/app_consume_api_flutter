@@ -18,6 +18,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String description = "";
   String category = "";
   String image = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1280px-HD_transparent_picture.png";
+  var allProducts = [];
   void _getData(int id) async {
     setState(() {
       _counter++;
@@ -57,7 +58,72 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
+  void limparTudo() {
+    setState(() {
+                    _counter = 0;
+                      title = "";
+                      price = "";
+                      description = "";
+                      category = "";
+                      image = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1280px-HD_transparent_picture.png";
+                   
+                  });
+  }
+
+
+  
+
   @override
+  void getAll()async {
+    var url = Uri.https('fakestoreapi.com','/products',{'q': '{https}'});
+
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+        var jsonResponse =
+            convert.jsonDecode(response.body) as List<dynamic>;
+
+        var array = jsonResponse;
+
+        array.forEach((produto) {
+
+          // print(produto['title']);
+          setState(() {
+            allProducts.add({
+            title : produto['title'],
+            price : produto['price'],
+            description : produto['description'],
+            category : produto['category'],
+            image : produto['image']
+          });
+          });
+          
+        });
+
+      // print("array quantidade" + allProducts.length.toString());
+        
+        limparTudo();
+         ListView.builder(
+              itemCount: allProducts.length,
+              itemBuilder: (context, index) {
+                final product = allProducts[index];
+                if(!allProducts.isEmpty){
+                     return const Column(
+                  children: [
+                    Text("data")
+                  ],
+                );
+                }
+               
+
+            });
+
+      } else {
+        print('Request failed with status: ${response.statusCode}.');
+      }
+  }
+
+  
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -65,6 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
+        
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -77,35 +144,68 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    _counter = 0;
-                    setState(() {
-                      title = "";
-                      price = "";
-                      description = "";
-                      category = "";
-                      image = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1280px-HD_transparent_picture.png";
-                    });
-                  });
+                  limparTudo();
                 },
-                child: Text("Zerar")),
+                child: const Text("Zerar")),
+                ElevatedButton(onPressed: (){
 
-            Container(
-              margin: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                border: Border.all(width: 1)
-              ),
-              child: Column(
-                children: [
-                  Image.network(image, width: 100,),
-                  Text(title),
-                  Text(price),
-              Text(description),
-              Text(category)
+
+
+
+
+
+
+                    // Text("data");
+
+                  // funcao mostrar todas 
+                  getAll();
+
+                  // print("array quantidade" + allProducts.length.toString());
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+                }, child: Text("Mostrar todas")),
+  
+
+  
+
+           
+            
+
+
+
+
+
+
+
+
+
+            // Container(
+            //   margin: EdgeInsets.all(20),
+            //   decoration: BoxDecoration(
+            //     border: Border.all(width: 1)
+            //   ),
+            //   child: Column(
+            //     children: [
+            //       Image.network(image, width: 100,),
+            //       Text(title),
+            //       Text(price),
+            //   Text(description),
+            //   Text(category)
               
-                ],
-              ),
-            ),
+            //     ],
+            //   ),
+            // ),
             
             
           ],
